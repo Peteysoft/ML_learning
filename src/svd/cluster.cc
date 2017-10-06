@@ -1,7 +1,7 @@
 #include <gsl/gsl_rng.h>
 #include <sys/timeb.h>
 
-#define MAXITER 100
+#define MAXITER 1000
 
 #define LOGGING 1
 
@@ -20,32 +20,17 @@ double cluster_metric2(double *v1, double *v2, int n) {
 int cluster(double **x, int m, int n, int nc, double **mu) {
   timeb now;		//for random number generator seed
   gsl_rng *rng;		//random number generator
-  double min[n];	//minimum of each feature
-  double max[n];	//maximum of each feature
   int code[m];		//which cluster does each point belong to?
-  int np[nc];		//number of pointer belonging to each cluster
+  int np[nc];		//number of points belonging to each cluster
   double d2;		//distance squared
   double d2min;		//minimum distance to cluster center
   int cmin;		//index of cluster center with min. dist.
   double diff;		//difference between two coords
   double **mu2;		//revised cluster centers
   int finish;		//flag for convergence
+  int ind[nc];
 
   printf("Performing cluster analysis:\n");
-  //find the ranges for the data:
-  for (int j=0; j<n; j++) {
-    min[j]=x[0][j];
-    max[j]=x[0][j];
-  }
-  for (int i=1; i<m; i++) {
-    for (int j=0; j<n; j++) {
-      if (x[i][j] < min[j]) {
-        min[j]=x[i][j];
-      } else if (x[i][j] > max[j]) {
-        max[j]=x[i][j];
-      }
-    }
-  }
 
   //so we can initialize the cluster centers with a bunch of random points:
   //initialize and seed the random number generator:
@@ -53,10 +38,23 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
   ftime(&now);
   gsl_rng_set(rng, (long) now.time + ((long) now.millitm) << 7);
   for (int i=0; i<nc; i++) {
+    int flag;
+    //this is a bit crude:
+    do {
+      flag=0;
+      ind[i]=gsl_rng_uniform(rng)*m;
+      for (int j=0; j<i; j++) {
+        if (ind[i]==ind[j]) {
+          flag=1;
+	  break;
+	}
+      }
+    } while (flag);
     for (int j=0; j<n; j++) {
-      mu[i][j]=min[j]+gsl_rng_uniform(rng)*(max[j]-min[j]);
+      mu[i][j]=x[ind[i]][j];
+      //mu[i][j]=min[j]+gsl_rng_uniform(rng)*(max[j]-min[j]);
 #ifdef LOGGING
-      printf("%20.8g", mu[i][j]);
+      printf("%14.6lg", mu[i][j]);
 #endif
     }
 #ifdef LOGGING
@@ -80,8 +78,10 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
 
   //do this until we reach convergence
   //(here we define it as points don't change cluster centers)
-  finish=1;
   for (int iter=0; iter<MAXITER; iter++) {
+#ifdef LOGGING
+    printf("%d\n", iter);
+#endif
     //initialize to zero:
     for (int i=0; i<nc; i++) {
       np[i]=0;
@@ -89,6 +89,7 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
     }
     //find nearest cluster center to each point
     //add this point to revised cluster center
+    finish=1;
     for (int i=0; i<m; i++) {
       cmin=0;
       d2min=0;
@@ -109,11 +110,11 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
       for (int j=0; j<n; j++) {
         mu[i][j]=mu2[i][j]/np[i];
 #ifdef LOGGING
-        printf("%20.8g", mu[i][j]);
+        printf("%14.6lg", mu[i][j]);
 #endif
       }
 #ifdef LOGGING
-      printf("\n");
+      printf(" %d\n", np[i]);
 #endif
     }
 #ifdef LOGGING
@@ -125,5 +126,8 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
   delete [] mu2[0];
   delete [] mu2;
 
+  gsl_rng_free(rng);
+
+  //return -1;
   return nc;
 }
