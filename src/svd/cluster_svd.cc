@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
       ave[j]+=a[i][j];
     }
   }
-  for (int i=0; i<m; i++) ave[i]/=m;
+  for (int i=0; i<n; i++) ave[i]/=m;
   for (int i=0; i<m; i++) {
     for (int j=0; j<n; j++) {
       a[i][j]-=ave[j];
@@ -116,11 +116,10 @@ int main(int argc, char **argv) {
   mu_p[0]=new double[MAX_CLUSTER*n];
   for (int i=1; i<MAX_CLUSTER; i++) mu_p[i]=mu_p[0]+i*n;
 
+  //perform the cluster analysis:
   if (nsv>0) {
-    //make space for cluster centers:
     nc=cluster(a, m, nsv, MAX_CLUSTER, mu_p);
   } else {
-    //make space for cluster centers:
     nc=cluster(a, m, n, MAX_CLUSTER, mu_p);
   }
 
@@ -149,7 +148,6 @@ int main(int argc, char **argv) {
         mu[i][j]+=mu_p[i][j];
       }
     }
-    for (int j=0; j<n; j++) printf("%16.8lg", mu[i][j]);
   }
 
   //write the results to a file:
@@ -161,8 +159,8 @@ int main(int argc, char **argv) {
 
   fprintf(fs, "%d %d\n", nc, n);
   for (int i=0; i<nc; i++) {
-    for (int j=0; j<n; j++) printf("%16.8lg", mu[i][j]);
-    //for (int j=0; j<n; j++) fprintf(fs, "%16.8lg", mu[i][j]);
+    //for (int j=0; j<n; j++) printf("%16.8lg", mu[i][j]);
+    for (int j=0; j<n; j++) fprintf(fs, "%16.8lg", mu[i][j]);
     fprintf(fs, "\n");
   }
 
