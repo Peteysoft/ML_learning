@@ -21,12 +21,9 @@
 	\caption{A sample statistical classification problem, showing the border between the two classes.}
 \end{figure}
 
-Statistical classification, as with most of statistics, is fundamentally based
-in probability.
-Therefore, if you want to do work in the field it's best to acquire a thorough 
-grounding in probability theory and Bayes theorem and an understanding of how 
-these things
-can be applied to classification problems.
+Probability theory is one of the most fundamental tools we have for describing the universe. It is especially relevant to statistical classification and can be used to derive a multitude of important results and to inform our understanding.
+This introduction is intended to help you understand probability theory and Bayes’ theorem and how they apply to statistical classification. It will allow you to derive non-obvious results that can vastly improve and simplify your classification models.
+
 Note that this introduction, while intended for beginners, nonetheless assumes
 knowledge of first- and some second-year university-level mathematics, 
 especially linear algebra but also some single and multi-variate calculus.
@@ -123,7 +120,7 @@ integral is over the domain of $x$.
 
 In statistical classification, we are dealing with probabilities
 having a very specific form.
-One of the probabilities is scalar and discrete while the other is vector
+One of the variables is scalar and discrete while the other is vector
 and continuous. Thus:
 \begin{equation}
 	P(\vec x, \, i) = P (i|\vec x) P(\vec x) = P(\vec x|i) P(i)
@@ -517,6 +514,11 @@ other caveat: the normalization must be done separately from the least
 squares minimization.
 In other words, we form the normal equations from (\ref{multiclass2}) first,
 then plug these into (\ref{symmetric_norm}).
+
+\section{Conclusion}
+
+Mathematical models are not closed systems. They can be expanded, re-purposed, and recombined.
+The applications of probability and Bayes’ theorem and the problems we can put them to are limited only by the imagination. Here we have presented just a few of the ways to use these tools to help gain a foothold in the complex world of computational learning algorithms.
 
 \section{Problems}
 

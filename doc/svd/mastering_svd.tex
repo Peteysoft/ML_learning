@@ -51,7 +51,7 @@ So they set about teasing out the different factors that made up intelligence
 so as to pull out the most important one.
 
 SVD is known under many different names.
-In the early days, as the above passage implies, it was called, ''factor
+In the early days, as the above passage implies, it was called, ``factor
 analysis.''
 Other terms include principal component (PC) decomposition and 
 emprical orthogonal function (EOF) analysis.
@@ -343,34 +343,36 @@ To begin with, we will need to read in the data to fill up $A$.
 I hope everyone understands C++:
 
 \begin{verbatim}
-#include <stdio.h>
 
-//subroutine for performing singular value decomposition:
+#include <stdio.h>
+#include <stdlib.h>
+
+//subroutine header for performing singular value decomposition:
 #include "svd.h"
 
-//subroutine for performing cluster analysis:
+//subroutine header for performing cluster analysis:
 #include "cluster.h"
 
 //maximum number of clusters:
-define MAX_CLUSTER 20
+#define MAX_CLUSTER 10
 
 int main(int argc, char **argv) {
-  char *infile;		//input file
-  char *outfile;	//output file
-  FILE *fs;		//file pointer
-  float **a;		//matrix of training data
-  int m;		//number of rows in matrix
-  int n;		//number of columns in matrix
-  int nsv;		//number of singular values
+  char *infile;            //input file
+  char *outfile;            //output file
+  FILE *fs;                //file pointer
+  double **a;            //matrix of training data/U
+  int m;                //number of rows in matrix
+  int n;                //number of columns in matrix
+  int nsv;                //number of singular values
 
-  if (argc!=3) {
+  if (argc!=4) {
     printf("syntax: cluster_svd nsv train centers\n");
     printf("  where:\n");
-    printf("nsv     = number of singular values\n");
+    printf("nsv      = number of singular values (0 = use untransformed data)\n");
     printf("infile   = ASCII input file containing training data\n");
-    printf("output = ASCII output file containing cluster centers\n");
+    printf("output   = ASCII output file containing cluster centers\n");
     printf("\n");
-    printf("file format:\n"
+    printf("file format:\n");
     printf("- one line header containing number of rows and number of columns\n");
     printf("- row major list of each matrix element\n");
     exit(1);
@@ -383,25 +385,30 @@ int main(int argc, char **argv) {
   infile=argv[2];
   outfile=argv[3];
 
-  fs=fopen("infile, "r");
+  fs=fopen(infile, "r");
   if (fs==NULL) {
     fprintf(stderr, "Error opening input file, %s\n", infile);
     exit(1);
   }
 
-  if (fscanf(fs, "%d %d", &m, &n)!2) {
-    fprintf(stderr, "Format error in input file: %s", infile, ", line 0\n");
+  if (fscanf(fs, "%d %d", &m, &n)!=2) {
+    fprintf(stderr, "Format error in input file: %s line 0", infile);
+    exit(1);
+  }
+  if (nsv>n) {
+    fprintf(stderr, "Command line parameter nsv=%d out of range\n", nsv);
     exit(1);
   }
 
-  a=new * float[m];
-  a[0]=new float[m*n];
+  a=new double *[m];
+  a[0]=new double[m*n];
   for (int i=1; i<m; i++) a[i]=a[0]+i*n;
   for (int i=0; i<m; i++) {
     for (int j=0; j<n; j++) {
-      if (fscanf(fs, "%g", a[i]+j)!=1) {
-	fprintf(stderr, "Format error in input file, %s", infile, ", line %d\n", i);
-	exit(1);
+      if (fscanf(fs, "%lg", a[i]+j)!=1) {
+        fprintf(stderr, "Format error in input file, %s, line %d\n", infile, i);
+        exit(1);
+      }
     }
   }
 
@@ -437,23 +444,43 @@ Using the SVD routine is equally straight-forward.
 Continuing from the previous section:
 
 \begin{verbatim}
-  real *s;              //singular values
-  real **v;             //right singular vectors
 
-  //make space for singular values:
-  s=new real[n];
+  double *ave;
+  double *s;                  //singular values
+  double **vt;                //right singular vectors
 
-  //make space for right singular vectors:
-  vt=new real *[nsv];
-  vt[0]=new real[n*nsv];
-  for (int i=1; i<nsv; i++) vt[i]=u[0]+i*n;
-
-  //perform the decomposition:
-  int err=svd(a, m, n, nsv, s, vt);
-  if (err!=0) {
-    fprintf(stderr, "Error in svd subroutine\n");
-    exit(err);
+  //first we calculate and remove the arithmetic means:
+  ave=new double[n];
+  for (int i=0; i<n; i++) ave[i]=0;
+  for (int i=0; i<m; i++) {
+    for (int j=0; j<n; j++) {
+      ave[j]+=a[i][j];
+    }
   }
+  for (int i=0; i<n; i++) ave[i]/=m;
+  for (int i=0; i<m; i++) {
+    for (int j=0; j<n; j++) {
+      a[i][j]-=ave[j];
+    }
+  }
+
+  if (nsv>0) {
+    //make space for singular values:
+    s=new double[n];
+
+    //make space for right singular vectors:
+    vt=new double *[n];
+    vt[0]=new double[n*n];
+    for (int i=1; i<n; i++) vt[i]=vt[0]+i*n;
+
+    //perform the decomposition:
+    int err=svd(a, m, n, s, vt);
+    if (err!=0) {
+      fprintf(stderr, "Error in svd subroutine\n");
+      exit(err);
+    }
+  }
+
 \end{verbatim}
 
 \subsection{Part 3: performing the cluster analysis}
@@ -480,15 +507,20 @@ cluster centers:
 
 \begin{verbatim}
 
-  real **mu_p;		//matrix of cluster centers
-  int nc;		//number of cluster centers
+  double **mu_p;        //matrix of cluster centers
+  int nc;               //number of cluster centers
 
   //make space for cluster centers:
-  mu_p=new real *[MAX_CLUSTER];
-  mu_p[0]=new real[MAX_CLUSTER*nsv];
-  for (int i=1; i<MAX_CLUSTER; i++) mu_p[i]=mu_p[0]+i*nsv;
+  mu_p=new double *[MAX_CLUSTER];
+  mu_p[0]=new double[MAX_CLUSTER*n];
+  for (int i=1; i<MAX_CLUSTER; i++) mu_p[i]=mu_p[0]+i*n;
 
-  nc=cluster(u, m, nsv, MAX_CLUSTER, mu_p);
+  //perform the cluster analysis:
+  if (nsv>0) {
+    nc=cluster(a, m, nsv, MAX_CLUSTER, mu_p);
+  } else {
+    nc=cluster(a, m, n, MAX_CLUSTER, mu_p);
+  }
 
   if (nc <= 0) {
     fprintf(stderr, "Cluster algorithm failed");
@@ -520,18 +552,24 @@ We want to store the cluster centers in the un-transformed coordinate system,
 thus we want to apply Equation (\ref{untransform2}).
 
 \begin{verbatim}
-  real **mu;		//cluster centers in un-transformed coords
+
+  double **mu;        //cluster centers in un-transformed coords
 
   //allocate space for the un-transformed cluster centers:
-  mu=new real *[nc];
-  mu[0]=new real[nc*n];
-  for (int i=1; i<n; i++) mu[i]=mu[0]+i*n;
+  mu=new double *[nc];
+  mu[0]=new double[nc*n];
+  for (int i=1; i<nc; i++) mu[i]=mu[0]+i*n;
 
   //perform the coordinate transformation:
-  for {int i=0; i<nc; i++}
+  for (int i=0; i<nc; i++) {
     for (int j=0; j<n; j++) {
+      //mu[i][j]=ave[j];
       mu[i][j]=0;
-      for (int k=0; k<nsv; j++) mu[i]+=vt[j][k]*s[j]*mu_p[j];
+      if (nsv>0) {
+        for (int k=0; k<nsv; k++) mu[i][j]+=vt[k][j]*s[k]*mu_p[i][k];
+      } else {
+        mu[i][j]+=mu_p[i][j];
+      }
     }
   }
 
@@ -544,8 +582,9 @@ thus we want to apply Equation (\ref{untransform2}).
 
   fprintf(fs, "%d %d\n", nc, n);
   for (int i=0; i<nc; i++) {
-    for (int j=0; j<n; j) fprintf(fs, "%16.8g", mu[i][j]);
-    fprintf("\n");
+    //for (int j=0; j<n; j++) printf("%16.8lg", mu[i][j]);
+    for (int j=0; j<n; j++) fprintf(fs, "%16.8lg", mu[i][j]);
+    fprintf(fs, "\n");
   }
 
   fclose(fs);
@@ -557,17 +596,18 @@ thus we want to apply Equation (\ref{untransform2}).
   delete [] mu_p[0];
   delete [] mu_p;
 
-  delete [] u[0];
-  delete [] u;
-  delete [] s;
-  delete [] v[0];
-  delete [] v;
-
-  delete [] x[0];
-  delete [] x;
+  delete [] ave;
+  delete [] a[0];
+  delete [] a;
+  if (nsv>0) {
+    delete [] s;
+    delete [] vt[0];
+    delete [] vt;
+  }
 
   return 0;
 }
+
 \end{verbatim}
 
 \subsection{Problems}
