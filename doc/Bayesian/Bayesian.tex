@@ -76,15 +76,16 @@ always be the same but this need not be the case.
 Consider a game of Black Jack.
 What is the probability that the next card drawn is worth ten points (is a ten
 or a face card) given that the previous card was also worth ten points?
-Suppose there are 7 ten-point cards out of a deck of 34 remaining.
+Suppose there were 7 ten-point cards out of a deck of 34 remaining before
+the last draw.
 Now the probabilities are different depending upon the outcome of the previous
 event.
-If the previous card was worth ten, there is a $3/17$ chance of getting a card
-worth ten, otherwise the probability is $7/34$.
-Since the probability that the previous card was worth ten is also $7/34$
+If the previous card was worth ten, there is a $6/33=2/11$ chance of getting a card
+worth ten, otherwise the probability is $7/33$.
+Since the probability that the previous card was worth ten is $7/34$
 the joint probability, or the probability of both event occuring is:
 \begin{equation}
-	P_{ij} = P(j | i) P_i = (7/34)(3/17) = 21/578 \approx 0.00363
+	P_{ij} = P(j | i) P_i = (7/34)(2/11) = 7/187 \approx 0.0374
 	\label{joint_prob}
 \end{equation}
 where $P_i$ is the probability that the previous cards was worth ten and
@@ -115,7 +116,7 @@ given:
 When working with continuous random variables, summations become integrals
 so that Equation (\ref{prior_prob}) becomes:
 \begin{equation}
-	P(x) = \int P(x,\, y) \mathrm d x
+	P(x) = \int P(x,\, y) \mathrm d y
 \end{equation}
 where the $P(x,\,y)$ is the joint probability of both $x$ and $y$ and the 
 integral is over the domain of $x$.

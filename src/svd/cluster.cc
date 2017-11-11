@@ -1,9 +1,25 @@
+#include <stdlib.h>
+
 #include <gsl/gsl_rng.h>
 #include <sys/timeb.h>
 
 #define MAXITER 1000
 
 #define LOGGING 1
+
+//we want to sort the clusters by size:
+struct cluster_t {
+  double *centre;		//location of cluster center
+  int size;			//number of training vectors in cluster
+};
+
+int cluster_compare(const void *v1, const void *v2) {
+  cluster_t *c1=(cluster_t *) v1;
+  cluster_t *c2=(cluster_t *) v2;
+  if (c1->size > c2->size) return -1;
+  if (c1->size < c2->size) return 1;
+  return 0;
+}
 
 //calculate the distance squared:
 double cluster_metric2(double *v1, double *v2, int n) {
@@ -29,6 +45,8 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
   double **mu2;		//revised cluster centers
   int finish;		//flag for convergence
   int ind[nc];
+  //sort the clusters by size:
+  cluster_t *cf;
 
   printf("Performing cluster analysis:\n");
 
@@ -127,6 +145,20 @@ int cluster(double **x, int m, int n, int nc, double **mu) {
   delete [] mu2;
 
   gsl_rng_free(rng);
+
+  //C version of sort still seems easier (or certainly less verbose) to use:
+  cf=new cluster_t[nc];
+  for (int i=0; i<nc; i++) {
+    cf[i].centre=mu[i];
+    cf[i].size=np[i];
+  }
+
+  qsort(cf, nc, sizeof(cluster_t), &cluster_compare);
+
+  for (int i=0; i<nc; i++) {
+    //so we don't screw up the "clever" allocation sequence:
+    for (int j=0; j<n; j++) mu[i][j]=cf[i].centre[j];
+  }
 
   //return -1;
   return nc;
