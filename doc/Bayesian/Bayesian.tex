@@ -130,7 +130,7 @@ attributes or {\it features}.
 
 Typically, the goal of Bayesian-based statistical classification is to
 estimate either the joint probability, $P(\vec x, \, i)$, or the conditional
-probability, $P(\vec x| i)$.
+probability, $P(i | \vec x)$.
 Classifications are normally done on the basis of {\it maximum likelihood}:
 \begin{equation}
 	c (\vec x) = \arg \max_i P(i|\vec x) = \arg \max_i P(\vec x,\, i)
@@ -502,7 +502,7 @@ One way is to introduce a ``slack'' variable:
 	\sum_j P(j|\vec x) & = & 1 \label{symmetric_norm}
 \end{eqnarray}
 where $Q \vec p = \vec b$ is the linear system for the unconstrained problem
-and $\lambda$ is a ``slack'' variable.
+and $\lambda$ is a Lagrange multiplier, the ``slack'' variable.
 
 For the ``one-versus-one'' method of multi-class classification, where we
 compare each class with each of the others in turn, this is all we need.
@@ -544,7 +544,7 @@ The applications of probability and Bayes’ theorem and the problems we can put t
 		Perform statistical classifications by fitting a multi-dimensional Gaussian to each of the classes:
 		\begin{equation}
 			P(\vec x | i) \approx \frac{1}{\sqrt{(2 \pi)^D |\Sigma|}}
-				\exp \left [ - (\vec x - \vec \mu) \Sigma (\vec x - \vec \mu) \right ]
+			\exp \left [ - \frac{1}{2}(\vec x - \vec \mu) \Sigma^{-1} (\vec x - \vec \mu) \right ]
 			\end{equation}
 			where $\Sigma$ is the covariance matrix, $\vec \mu$ is the arithmetic mean and $D$ is the dimension of the features data. Measure the accuracy of your results. Don't forget to divide the data into a test set and a training set.
 \end{enumerate}
