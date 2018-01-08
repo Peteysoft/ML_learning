@@ -1,0 +1,165 @@
+\documentclass{article}
+
+\begin{document}
+
+\title{Essentials of Linear Algebra}
+
+\author{Peter Mills}
+
+\maketitle
+
+\section{Introduction}
+
+Of all the tools in my box as a scientist and computer programmer, linear
+algebra has been the most useful.
+If a problem can be reduced to one in linear algebra, it is generally 
+considered solved and efficient methods exist to solve even large linear
+systems.
+I have used linear algebra to solve systems of both ordinary and partial
+differential equations.
+It is used extensively in statistics and forms the basis of least squares
+fitting.
+
+....
+
+Simply put, if you cannot do linear algebra, you cannot do science and you
+cannot do machine learning.
+This tutorial will introduce you to all the essentials you need do work with
+systems of linear equations.
+
+\section{Notation}
+
+Consider the following system of linear equations:
+\begin{eqnarray}
+4 & = & x_1 + 2 x_2 + 3 x_3 \\
+5 & = & 3 x_1 + 7 x_2 + 2 x_3 \\
+0.5 & = & 2.1 x_1 + 5.3 x_2 + 4.7 x_3
+\end{eqnarray}
+Note that there are three equations 
+and three unknowns: $x_1$, $x_2$ and $x_3$.
+As a general rule, for a system of equations to be solvable, there should be
+the same number of equations as unknowns.
+This is not always the case: sometimes some symmetry in the equations allows
+one to solve for extra unknowns and sometimes there is a redundancy in the
+equations that make it impossible to solve for all the unkowns.
+
+Lets rewrite this equation by assigning each of the coefficients 
+and each of the constant values on the left-hand-side (LHS)  
+to a variable:
+\begin{eqnarray}
+y_1 & = & a_{11} x_1 + a_{12} x_2 + a_{13} x_3 \\
+y_2 & = & a_{21} x_1 + a_{22} x_2 + a_{23} x_3 \\
+y_3 & = & a_{31} x_1 + a_{32} x_2 + a_{33} x_3
+\end{eqnarray}
+Note that each of the coefficients has the same variable name, $a$, but 
+different subscripts.
+The first subscript increments with the equation while the second increments
+based on which $x$ the $a$ multiplies.
+A similar system is used for the constants.
+
+Lets rewrite this again, but for an arbitrarily large system:
+\begin{eqnarray}
+y_1 & = & a_{11} x_1 + a_{12} x_2 + a_{13} x_3 + ... + a_{1n} x_n \\
+y_2 & = & a_{21} x_1 + a_{22} x_2 + a_{23} x_3 + ... + a_{2n} x_n \\
+y_3 & = & a_{31} x_1 + a_{32} x_2 + a_{33} x_3 + ... + a_{3n} x_n \\ \nonumber
+... \\
+y_m & = & a_{m1} x_1 + a_{m2} x_2 + a_{m3} x_3 + ... + a_{mn} x_n
+\end{eqnarray}
+Note that there are $m$ equations and $n$ unknowns.
+Now we rewrite it again using a more powerful technique called 
+{\it summation notation}:
+\begin{equation}
+y_i = \sum_{j=1}^n a_{ij} x_j; ~ i=[1..m]
+\end{equation}
+Notice how much more compact this notation is yet nonetheless captures
+everything contained in the previous two systems.
+We can encapsulate this even more by {\it abstracting} the entire operation
+as a type of multiplication:
+\begin{equation}
+\vec y = A \vec x
+\label{matrix_vector_multiplication}
+\end{equation}
+where $A$ is an $m \times n$ {\it array}, $\vec y$ is a {\it vector} of length
+$m$ and $\vec x$ is a vector of length $n$.
+To bring this full circle, we write:
+\begin{equation}
+A = \left [ \begin{array}{lll}
+1 & 2 & 3 \\
+3 & 7 & 2 \\
+2.1 & 5.3 & 4.7
+\end{array}
+\right ]
+\end{equation}
+and:
+\begin{equation}
+\vec y = \left [ \begin{array}{l}
+4 \\
+5 \\
+0.5
+\end{array}
+\right ]
+\end{equation}
+
+Half the battle in mastering linear algebra comes in mastering the notation.
+Usually when I am stuck in a problem I will move down to each of the less
+abstract notations in turn, which, while more verbose, are also more clear.
+
+\subsection{Example: proving the distributive property}
+
+The same notation is used in Equation (\ref{matrix_vector_multiplication})
+as for multiplication.
+Indeed, it is even called multiplication: we are multiplying a matrix with
+a vector.
+There is a reason for this.
+Matrix multiplication shares many of the same properties as scalar multiplication.
+One of these is the distributive property:
+\begin{equation}
+A \vec x + A \vec y = A (\vec x + \vec y)
+\end{equation}
+We can use summation notation to prove this property:
+\begin{equation}
+\sum_j a_{ij} x_j + \sum_j a_{ij} y_j = \sum_j a_{ij} (x_j + y_j)
+\end{equation}
+
+\subsection{Matrix transpose}
+
+One way in which matrix multiplication differs from scalar multiplication
+is that it is not commutative.
+In fact we can write:
+\begin{equation}
+A^T \vec x = \vec x A
+\end{equation}
+where $A^T$ is the {\it transpose} of matrix $A$.
+Writing this out in summation notation makes it clear.
+We simply swap the roles of $i$ and $j$:
+\begin{equation}
+\sum_j a_{ji} x_j
+\end{equation}
+Or alternatively:
+\begin{equation}
+\sum_i a_{ij} x_i
+\end{equation}
+
+\section{Solving systems of linear equations}
+
+In order to solve for the system in (\ref{example_system}) we need to learn
+one more notation system.
+This one removes all the variables leaving only the constants and coefficients:
+\begin{equation}
+	\left [ \begin{array}{lll|l}
+			4 & 1 & 2 & 3 & 4 \\
+			5 & 3 & 7 & 2 & 5 \\
+			0.5 & 2.1 & 5.3 & 4.7 & 0.5
+	\end{array} \right ]
+\end{equation}
+There are three elementary operations we can do on the rows of this system.
+As we would expect,
+any operation done on a row of coefficients is repeated on the constant.
+\begin{itemize}
+	\item Multiply a row by a constant value
+	\item Exchange rows
+	\item Add two rows
+\end{itemize}
+
+\end{document}
+
