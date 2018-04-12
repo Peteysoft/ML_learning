@@ -352,25 +352,6 @@ in (\ref{logistic_1d}) for $h=1$ and for different values of $b$.
 The classifier is assumed to be a perfect estimator for the conditional
 probabilities.
 
-A more sophisticated calibration exercise would transform the decision
-function such that it accurately represents the difference in conditional
-probabilities.
-Consider the following equation, derived strictly from the background material
-presented in the first two sections:
-\begin{equation}
-%\lim_{n \rightarrow \infty} \left \lbrace n = \sum_{i=1}^n \frac{\delta_{c y_i}}{P(c | \vec x_i)} \right \rbrace
-\lim_{n \rightarrow \infty} \sum_{i=1}^n \left \lbrace P(c | \vec x_i) - \delta_{c y_i} \right \rbrace = 0
-\label{full_cal}
-\end{equation}
-where $\delta$ is the Dirac delta function:
-\begin{equation}
-	\delta_{ij} = \left \lbrace \begin{array}{rl}
-		1 & i = j \\
-		0 & i \ne j
-	\end{array} \right .
-\end{equation}
-A well-calibrated estimator for the conditional probabilities should obey this
-equation.
 
 \section{Validation}
 
@@ -528,7 +509,6 @@ The applications of probability and Bayes’ theorem and the problems we can put t
 	\item What is the major disadvantage of the logistic classifier?
 	\item Derive Equation (\ref{class_size_cal}). (It's surprisingly difficult.) How important do you think it is, on average, to correct for the class distribution? Explain.
 	\item How would you calculate the ROC curves in Figure \ref{ROC}? Fill in the missing steps going from Equation (\ref{decision}) to (\ref{oned1}) to (\ref{logistic_1d}) and then to calculation of the ROC curves.
-	\item Derive Equation (\ref{full_cal}).
 	\item List the advantages of the uncertainty coefficient and the correlation coefficient (for binary classifiers) as a measure of classification skill.
 	What happens when 
 	a) the class labels are rearranged and 

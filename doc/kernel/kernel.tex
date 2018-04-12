@@ -1,3 +1,19 @@
+\documentclass{article}
+
+
+\usepackage{natbib}
+\bibliographystyle{apa}
+
+\usepackage{url}
+
+\newenvironment{eqnnon}{\begin{equation}}{\end{equation}}
+\newenvironment{eqnarraynon}{\begin{eqnarray}}{\end{eqnarray}}
+
+\input{kernel_symbol.tex}
+
+\begin{document}
+
+\tableofcontents
 
 \section{Introduction}
 
@@ -85,25 +101,35 @@ Contrast a ``point-wise'' estimator
 in which bandwidths are different for each training point but need only be determined once
 \citep{Terrell_Scott1992}.
 
+A common kernel is the multi-dimensional Gaussian:
+\begin{equation}
+	\vectorkernel(\point, \point^\prime, \bandwidth) = \exp \left ( - \frac{|\point - \point^\prime|^2}{2 \bandwidth^2} \right )
+	\label{Gaussian_kernel}
+\end{equation}
+%$\scalarkernel(x)=\exp(-x^2/2)$
+also called the normal equation and in SVM it is referred to as a
+``radial basis function'' or RBF for short.
+Gaussian kernels were used in \citet{Mills2009} and \citet{Mills2011} in a
+classifier known as adaptive Gaussian filter (AGF)
+to classify satellite data.
+
 To return the KNN method, consider a ``square'' kernel that returns 1 below
 a certain radius and 0 otherwise:
 \begin{equation}
 	\scalarkernel(r) = \left \lbrace
-	\begin{matrix}{lr}
+	\begin{array}{lr}
 		1; & r \ge \bandwidth \\
 		0; & r > \bandwidth
-		\end
-	\end{matrix}
+	\end{array} \right .
 \end{equation}
 Normalized so that the integral in (\ref{norm_def}) is unity ($N=1$)
 and expressed as a vector kernel including kernel parameters:
 \begin{equation}
 	\vectorkernel(\point, \point^\prime, \bandwidth) = \left \lbrace
-	\begin{matrix}{lr}
-		1; & |\point - \point^\prime| \le (2 \pi)^{D/2}i \bandwidth/\Gamma(D/2+1) \\
+	\begin{array}{lr}
+		1; & |\point - \point^\prime| \le sqrt{\pi} \bandwidth/\Gamma^{1/D}(D/2+1) \\
 		0; & |\point - \point^\prime| > \bandwidth
-		\end
-	\end{matrix}
+	\end{array} \right .
 \end{equation}
 
 Another method of improving the performance of a kernel-density estimator
@@ -222,216 +248,6 @@ classification error whereas a more basic kernel method is more ad hoc
 and does little more than sum the number of samples of a given class,
 weighted by distance.
 
-\subsection{Borders classification}
-
-\label{border_method}
-
-In kernel SVM, the decision border exists only implicitly in a hypothetical,
-abstract space. Even in linear SVM, if the software is generalized to 
-recognize the simple dot product as only one among many possible kernels,
-then the decision function may be built up, as in (\ref{svm_decision})
-through a sum of weighted kernels. This is the case for LIBSVM.
-The advantage of an explicit decision border as in 
-(\ref{linear_classifier}) or (\ref{decision_function0})
-is that it is fast. The problem with a linear border is that, except for a
-small class of problems, it is not very accurate.
-
-In the binary classification method described in \citet{Mills2011},
-a non-linear decision border is built up piece-wise from a collection of linear borders.
-It is essentially a root-finding procedure for a decision function,
-such as $\svmdecision$ in (\ref{svm_decision}).
-Let $\decisionfunction$ be a decision function
-that approximates the difference in conditional probabilities:
-\begin{eqnnon}
-	\decisionfunction(\point) \approx \diffcondprob(\point) = 
-	\condprob(1|\point) - \condprob(-1|\point)
-	\label{rdef}
-\end{eqnnon}
-where $\condprob(\class|\point)$ represents the conditional probabilities of
-a binary classifier having labels $\class \in \lbrace -1, 1 \rbrace$.
-For a simple kernel estimator, for instance, 
-$\diffcondprob$ is estimated as follows:
-\begin{equation}
-	\kerneldecision(\testpoint) = \frac{\sum_i \classlabel_i \vectorkernel(\testpoint, \sample_i)}{\sum_i \vectorkernel(\testpoint, \sample_i)}
-	\label{kernel_decision}
-\end{equation}
-where $\classlabel_i \in \lbrace -1, 1 \rbrace$.
-For the variable bandwidth kernel estimator defined by (\ref{agf_def}), this works out to:
-\begin{equation}
-	\vbdecision(\testpoint) = \frac{1}{\kernelsum} \sum_i \classlabel_i \scalarkernel \left (\frac{|\testpoint - \sample_i|}{\bandwidth(\testpoint)} \right )
-	\label{vb_kernel_r}
-\end{equation}
-A variable bandwidth kernel-density estimator with a Gaussian kernel,
-\begin{equation}
-	\vectorkernel(\point, \point^\prime, \bandwidth) = \exp \left ( - \frac{|\point - \point^\prime|^2}{2 \bandwidth^2} \right )
-	\label{Gaussian_kernel}
-\end{equation}
-%$\scalarkernel(x)=\exp(-x^2/2)$
-we will refer to as an ``Adaptive Gaussian Filter'' or AGF for short.
-This kernel will also be used for SVM where it's often called a ``radial
-basis function'' or RBF for short.
-
-The procedure is as follows: pick a pair of points on either side of the decision
-boundary (the decision function has opposite signs). Good candidates are one
-random training sample from each class. Then, zero the decision function
-along the line between the points. This can be done as many times as needed
-to build up a good representation of the decision boundary.
-We now have a set of points, $\lbrace \bordervector_i \rbrace$, such that
-$\decisionfunction(\bordervector_i)=0$ for every $i \in [1..\nborder]$ where
-$\nborder$ is the number of border samples.
-
-Along with the border samples,  $\lbrace \bordervector_i \rbrace$, we also
-collect a series of normal vectors, $\lbrace \bordernormal_i \rbrace$
-such that:
-\begin{equation}
-\bordernormal_i=\nabla_{\point}{\decisionfunction |_{\point=\bordervector_i}}
-\end{equation}
-With this system, determining the class is a two step proces.
-First, the nearest border sample to the test point is found.
-Second, we define a new decision function, $\borderdecision$, 
-equivalent to (\ref{linear_classifier}), through a dot product with the normal:
-\begin{eqnarray}
-	i & = & \arg \min_j |\testpoint - \bordervector_j| \\ \nonumber
-	\borderdecision(\testpoint) & = & \bordernormal_i \cdot (\testpoint - \bordervector_i)
-	\label{border_decision}
-\end{eqnarray}
-The class is determined by the sign of the decision function as in 
-(\ref{class_value}).
-The time complexity is completely independent of the number
-of training samples, rather it is linearly proportional to the number of
-border vectors, $\nborder$, a tunable parameter. The number required for
-accurate classifications is dependent on the complexity of the decision
-border.
-
-The gradient of the variable-bandwidth kernel estimator in 
-(\ref{vb_kernel_r}) is:
-\begin{eqnnon}
-	\frac{\partial \vbdecision}{\partial \testcoord_j} = 
-	\frac{2 \bandwidth}{\kernelsum} \sum_i \classlabel_i
-	\scalarkernelderiv \left (\frac{\distance_i}{\bandwidth} \right )
-	\left [\frac{\testcoord_j - \samplecoord_{ij}}{\distance_i} 
-	- \distance_i \frac{\sum_k \scalarkernelderiv \left (\frac{\distance_k}{\bandwidth} \right )
-	\frac{\testcoord_j - \samplecoord_{kj}}{\distance_k}}
-{\sum_k \distance_k \scalarkernelderiv \left (\frac{\distance_k}{\bandwidth} \right )} \right ]
-\label{kernel_gradient}
-\end{eqnnon}
-where $\distance_i=|\point - \sample_i|$ is the distance between the 
-test point and the $i$th sample and $\scalarkernelderiv$ is the derivative
-of $\scalarkernel$.
-For AGF, this works out to:
-\begin{equation}
-	\frac{\partial \vbdecision}{\partial \testcoord_j} = 
-	\frac{1}{\bandwidth^2 \kernelsum} \sum_i \classlabel_i
-	\scalarkernel \left (\frac{\distance_i}{\bandwidth} \right )
-	\left [\samplecoord_{ij} - \testcoord_j
-	- \distance_i^2 \frac{\sum_k \scalarkernel \left (\frac{\distance_k}{\bandwidth} \right )
-	\left (\samplecoord_{kj} - \testcoord_j \right )}
-{\sum_k \scalarkernel \left (\frac{\distance_k}{\bandwidth} \right )\frac{1}{\distance_k^2}} \right ]
-\label{vb_gradient}
-\end{equation}
-where $K(x)=\exp(-x^2/2)$ \citep{Mills2011}.
-
-In LIBSVM, conditional probabilities are estimated by applying
-logistic regression \citep{Michie_etal1994} to
-the raw SVM decision function, $\svmdecision$, in (\ref{svm_decision}):
-\begin{equation}
-	\svmprob(\testpoint) = \tanh \left (\frac{\svmprobcoeffA \svmdecision(\testpoint)+ \svmprobcoeffB}{2} \right )
-	\label{svm_prob}
-\end{equation}
-\citep{Chang_Lin2011},
-where $\svmprobcoeffA$ and $\svmprobcoeffB$ are coefficients derived from
-the training data via a nonlinear fitting technique \citep{Platt1999,Lin_etal2007}.
-
-The gradient of the revised SVM decision function, above, is:
-\begin{equation*}
-	\nabla_{\point} {\svmprob} = \left [1 - \svmprob^2(\point) \right ] \sum_i \svmcoeff_i \classlabel_i \nabla_{\point} \vectorkernel(\point, \sample_i)
-\end{equation*}
-
-Gradients of the initial decision function are useful not just to derive normals to
-the decision boundary, but also as an aid to root finding when searching for
-border samples. If the decision function used to compute the border samples
-represents an estimator for the
-difference in conditional probabilities, then the raw decision value,
-$\borderdecision$,
-derived from the border sampling technique in (\ref{border_decision})
-can also return estimates of the conditional probabilities with little
-extra effort and little loss of accuracy, also using a sigmoid function:
-\begin{equation}
-	\borderprob(\testpoint) = \tanh \left [\borderdecision (\testpoint) \right ]
-	\label{border_probability}
-\end{equation}
-This assumes that the class posterior probabilities,
-$\condprob(\point | c)$, are approximately Gaussian near the border
-\citep{Mills2011}.
-
-The border classification algorithm returns an estimator,
-$\borderprob$, for the difference in conditional probabilities of
-a binary classifier using
-equations (\ref{border_decision}) and (\ref{border_probability}).
-It can be trained with the functions $\kerneldecision$ in (\ref{kernel_decision}),
-$\vbdecision$ in (\ref{vb_kernel_r}), $\svmprob$ in (\ref{svm_prob}),
-or any other 
-continuous, differentiable, non-parametric estimator for the difference
-in conditional probabilities, $\diffcondprob$.
-At the cost of a small reduction in accuracy,
-it has the potential to drastically reduce classification time for kernel
-estimators and other non-parametric statistical classifiers,
-especially for large training datasets,
-since it has $O(\nborder)$ time complexity instead of $O(\nsample)$
-complexity, where $\nborder$, the number of border samples, is a free parameter.
-The actual number chosen
-can trade off between speed and accuracy with rapidly diminishing returns
-beyond a certain point. 
-One hundred border samples ($\nborder=100$) is usually sufficient.
-The computation of $\borderprob$ also involves very simple operations---
-floating point addition, multiplication and numerical comparison, with no
-transcendental functions except for the very last step (which can be omitted)---so the coefficient for the time complexity will be small.
-
-A border classifier trained with AGF will be referred to as an ``AGF-borders''
-classifier while a border classifier trained with SVM estimates will
-be referred to as an ``SVM-borders'' classifier or an ``accelerated'' SVM classifier.
-
-\subsection{Multi-class classification}
-
-The border classification algorithm, like SVM, only works for binary 
-classification problems. It is quite easy to generalize a binary classifier
-to perform multi-class classifications by using several of them and the
-number of ways of doing so grows exponentially with the number of classes.
-Since LIBSVM uses the ``one-versus-one'' method \citep{Hsu_Lin2002} of 
-multi-class classification, this is the one we will adopt. 
-
-A major advantage of the
-borders classifier is that it returns probability estimates.
-These estimates have many uses including measuring the confidence of as well
-as recalibrating the class estimates \citep{Mills2009,Mills2011}.
-Thus the multi-class method
-should also solve for the conditional probabilities in addition to returning
-the class label.
-
-In a one-vs.-one scheme, the multi-class conditional probabilities 
-can be related to those of the binary classifiers as follows:
-\begin{eqnnon}
-	\diffcondprob_{ij}(\point) = \frac{\condprob(j|\point) - \condprob(i|\point)}{\condprob(i|\point) + \condprob(j|\point)}
-	\label{bin2multi}
-\end{eqnnon}
-where $i \in [1..\nclass-1]$, $j \in [1..\nclass]$, $\nclass$ is the number of classes, $j>i$,
-and $\diffcondprob_{ij}$ is the difference in conditional probabilities of
-the binary classifier that discriminates between the $i$th and $j$th classes.
-\citet{Wu_etal2004} transform this problem into the following linear system:
-\begin{eqnarray}
-	%\frac{1}{4} \sum_i \left [ \sum_{j|j \ne i} (\diffcondprob_{ij} + 1)^2 - \diffcondprob_{ij}^2 - \diffcondprob_{ij} - 2 \right ] \multiprob_i + \lmult & = & 0 \\ \nonumber -- where the fuck does this come from???
-	\multiprob_i \sum_{k|k \ne i} (\diffcondprob_{ki} + 1)^2 +
-	\sum_{j|j \ne i} \multiprob_j (1 - r_{ij}^2) + \lmult & = & 0 \\ \nonumber
-	\sum_j \multiprob_j & = & 1
-	\label{multiclass}
-\end{eqnarray}
-where $\multiprob_i = \condprob(i | \point)$ is the $i$th multi-class 
-conditional probability and $\lmult$ is a Lagrange multiplier.
-They also show that the constraints not included in the problem, that
-the probabilities are all positive, are always satisfied
-and describe an algorithm for solving it iteratively, although a
-simple matrix solver is sufficient.
-
 \section{Software}
 
 \label{methods}
@@ -464,5 +280,9 @@ Except for training and classifying the SVM models, all calculations in this pap
 with the libAGF library. To convert a LIBSVM model to a borders model,
 the single command, \verb/svm_accelerate/, can be used.
 Classifications are then performed with \verb/classify_m/.
+
+\bibliography{../ML_learning}
+
+\end{document}
 
 
