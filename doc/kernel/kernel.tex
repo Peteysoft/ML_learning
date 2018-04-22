@@ -93,8 +93,6 @@ ${\bandwidth^\dimension}$, some rearrangement shows that:
 \end{equation}
 This is a generalization of the $k$-nearest-neighbours (KNN) scheme in which the
 free parameter, $\kernelsum$, takes the place of $k$ \citep{Mills2009,Mills2011}.
-The bandwidth, $\bandwidth$, can be solved
-for using any numerical, one-dimensional root-finding algorithm.
 The bandwidth is determined uniquely for a given test point but is held constant for that
 one, which makes this a ``balloon'' estimator. 
 Contrast a ``point-wise'' estimator
@@ -120,15 +118,6 @@ a certain radius and 0 otherwise:
 	\begin{array}{lr}
 		1; & r \ge \bandwidth \\
 		0; & r > \bandwidth
-	\end{array} \right .
-\end{equation}
-Normalized so that the integral in (\ref{norm_def}) is unity ($N=1$)
-and expressed as a vector kernel including kernel parameters:
-\begin{equation}
-	\vectorkernel(\point, \point^\prime, \bandwidth) = \left \lbrace
-	\begin{array}{lr}
-		1; & |\point - \point^\prime| \le sqrt{\pi} \bandwidth/\Gamma^{1/D}(D/2+1) \\
-		0; & |\point - \point^\prime| > \bandwidth
 	\end{array} \right .
 \end{equation}
 
@@ -231,7 +220,7 @@ Mainly we are concerned here with the decision
 function in (\ref{svm_decision}) since the initial fitting will be done with
 an external software package, namely LIBSVM \citep{Chang_Lin2011}.
 
-Two things should be noted. First, the function $\expandedspace$ appears in
+Three things should be noted. First, the function $\expandedspace$ appears in
 neither the final decision function, (\ref{svm_decision}), nor in the
 optimization problem, (\ref{dual_problem}). Second, while the use of
 $\expandedspace$ implies that the time complexity of the decision function 
@@ -243,11 +232,23 @@ proportional to the number of samples, $\nsample$, producing a time complexity
 of $O(\nsample)$. Thus for large problems, calculating the decision value will
 be slow, just as in other kernel estimation problems.
 
-The advantage of SVM lies chiefly in its accuracy since it is minimizing the
-classification error whereas a more basic kernel method is more ad hoc
-and does little more than sum the number of samples of a given class,
-weighted by distance.
-
+Third, since SVM is a linear classifier operating in a transformed and expanded
+feature space, using a simple dot product for the kernel funcion returns a linear classifier:
+\begin{eqnarray}
+	\vectorkernel(\point, \point^\prime) & = & \point \cdot \point^\prime \\
+	\svmdecision(\testpoint) & = & \sum_i \svmcoeff_i \classlabel_i \testpoint \cdot \sample_i + \svmborderconst
+\end{eqnarray}
+By pulling out the test point from the summation we can show that the border
+to the class normal is equal to:
+\begin{equation}
+	\svmbordernormal = \sum_i \svmcoeff_i \classlabel_i \sample_i
+\end{equation}
+while the decision function is calculated:
+\begin{equation}
+	\svmdecision(\testpoint)=\svmbordernormal \cdot \testpoint + \svmborderconst
+\end{equation}
+This is a {\it linear classifier} or {\it perceptron}.
+	
 \section{Software}
 
 \label{methods}
