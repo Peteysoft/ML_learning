@@ -1,0 +1,132 @@
+\documentclass{article}
+
+\begin{document}
+
+\title{Boolean Logic}
+
+\author{Peter Mills}
+
+\maketitle
+
+\section{Introduction}
+
+Let $P$ be a binary proposition. 
+$P$ may take on two values: it is either true or false, $0$ or $1$;
+$P \in \lbrace 0, ~ 1 \rbrace$.
+
+Here we define   operators for two propositions, $X$ and $Y$:
+\begin{tabular}{ll}
+	Name & Symbol & Example \\
+	\hline
+	AND & $\land$ & $X \land Y$ \\
+	OR & $\lor$ & $X \lor Y$\\
+	NOT & $\lnot$ $\lnot X$ \\
+	NAND & - & $\lnot (X \land Y)$\\
+	NOR & - & $\lnot (X \lor Y)$ \\
+	if then & $\rightarrow$ & $X \rightarrow Y$ \\
+	if-and-only-if & $\iff$ & $X \iff Y$ \\
+	exclusive OR (XOR) & \oplus & $X \oplus Y$ \\ 
+	\hline
+\end{tabular}
+All operators return another binary proposition.
+
+Here is the {\it truth table} for the AND operator:
+\begin{tabular}{lll}
+	$X$ & $Y$ & $X \land Y$ \\
+	0 & 0 & 0 \\
+	0 & 1 & 0 \\
+	1 & 0 & 0 \\
+	1 & 1 & 1 \\
+	\hline
+\end{tabular}
+
+Note that the logical OR is different from the English ``or''.
+In English speech, ``or'' is the equivalent to the exclusive OR (
+XOR), defined below.
+\begin{tabular}{lll}
+	$X$ & $Y$ & $X \lor Y$ \\
+	0 & 0 & 0 \\
+	0 & 1 & 1 \\
+	1 & 0 & 1 \\
+	1 & 1 & 1 \\
+	\hline
+\end{tabular}
+
+NOT is logical negation:
+\begin{tabular}{lll}
+	$X$ & $\lnot X$ \\
+	 1 & 0 \\
+	 0 & 1 \\
+	\hline
+\end{tabular}
+
+Truth tables for NAND and NOR may be derived from their definitions.
+All operators may be defined in terms of $\lnot$ and either
+NAND or NOR.
+
+If $X$ then $Y$ ($X \rightarrow Y$) is defined:
+\begin{tabular}{lll}
+	$X$ & $Y$ & $X \rightarrow Y$ \\
+	0 & 0 & 1 \\
+	0 & 1 & 1 \\
+	1 & 0 & 0 \\
+	1 & 1 & 1 \\
+	\hline
+\end{tabular}
+This is equivalent to $\lnot X \lor Y$.
+$X$ if-and-only-if $Y$ is equivalent to a negated XOR whose truth table is
+as follows:
+\begin{tabular}{lll}
+	$X$ & $Y$ & $X \oplus Y$ \\
+	0 & 0 & 0 \\
+	0 & 1 & 1 \\
+	1 & 0 & 1 \\
+	1 & 1 & 0 \\
+	\hline
+\end{tabular}
+
+We can write:
+\begin{equation}
+	(A \liff B) \rightarrow \lnot (A \oplus B)
+	\label{iffimpliesnotxor}
+\end{equation}
+This is called a {\it tautology} which is a {\it logical expression} that
+always evaluates to 1.
+More generally, it is also a {\it theorem} within the system of Boolean
+logic.
+
+\subsection{Exercises}
+
+\begin{enumerate}
+	\item Write all the operators in terms of NOT and NOR.
+	\item Write all the operators in terms of NOT and NAND.
+	\item Derive the truth table for NOR, NAND and $\iff$.
+	\item Show that \ref{iffimpliesnotxor} is a tautology.
+\end{enumerate}
+
+\section{List of tautologies}
+
+Prove the following theorems:
+\begin{equation}
+$\lnot(A \and B}) \iff (\lnot A \lor \lnot B)
+\end{equation}
+Distributive property:
+\begin{eqnarray}
+	(A \and (B \lor C)) \iff ((A \land B) \lor (A \land C) \\
+	(A \or (B \land C)) \iff ((A \lor B) \land (A \lor C) \\
+\end{eqnarray}
+
+\begin{equation}
+	((A \rightarrow B) \land (B \rightarrow A) \iff (A \iff B))
+\end{equation}
+
+\section{Gates}
+
+Any boolean expression can be represented as a {\it logic circuit} 
+using {\it logic gates}.
+
+
+\section{Notation}
+
+\end{document}
+
