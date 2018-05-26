@@ -29,11 +29,14 @@ systems of linear equations.
 
 \section{Notation}
 
+\label{notation}
+
 Consider the following system of linear equations:
 \begin{eqnarray}
-4 & = & x_1 + 2 x_2 + 3 x_3 \\
-5 & = & 3 x_1 + 7 x_2 + 2 x_3 \\
-0.5 & = & 2.1 x_1 + 5.3 x_2 + 4.7 x_3
+	x_1 + 2 x_2 + 3 x_3 & = & 4 \\ \nonumber
+	3 x_1 + 7 x_2 + 2 x_3 & = & 5 \\ \nonumber
+	2.1 x_1 + 5.3 x_2 + 4.7 x_3 & = & 0.5
+	\label{example_system}
 \end{eqnarray}
 Note that there are three equations 
 and three unknowns: $x_1$, $x_2$ and $x_3$.
@@ -47,9 +50,9 @@ Lets rewrite this equation by assigning each of the coefficients
 and each of the constant values on the left-hand-side (LHS)  
 to a variable:
 \begin{eqnarray}
-y_1 & = & a_{11} x_1 + a_{12} x_2 + a_{13} x_3 \\
-y_2 & = & a_{21} x_1 + a_{22} x_2 + a_{23} x_3 \\
-y_3 & = & a_{31} x_1 + a_{32} x_2 + a_{33} x_3
+	a_{11} x_1 + a_{12} x_2 + a_{13} x_3 & = & y_1 \\
+	a_{21} x_1 + a_{22} x_2 + a_{23} x_3 & = & y_2 \\
+	a_{31} x_1 + a_{32} x_2 + a_{33} x_3 & = & y_3
 \end{eqnarray}
 Note that each of the coefficients has the same variable name, $a$, but 
 different subscripts.
@@ -59,31 +62,31 @@ A similar system is used for the constants.
 
 Lets rewrite this again, but for an arbitrarily large system:
 \begin{eqnarray}
-y_1 & = & a_{11} x_1 + a_{12} x_2 + a_{13} x_3 + ... + a_{1n} x_n \\
-y_2 & = & a_{21} x_1 + a_{22} x_2 + a_{23} x_3 + ... + a_{2n} x_n \\
-y_3 & = & a_{31} x_1 + a_{32} x_2 + a_{33} x_3 + ... + a_{3n} x_n \\ \nonumber
+	a_{11} x_1 + a_{12} x_2 + a_{13} x_3 + ... + a_{1n} x_n & = & y_1 \\
+	a_{21} x_1 + a_{22} x_2 + a_{23} x_3 + ... + a_{2n} x_n & = & y_2 \\
+	a_{31} x_1 + a_{32} x_2 + a_{33} x_3 + ... + a_{3n} x_n & = & y_3 \\ \nonumber
 ... \\
-y_m & = & a_{m1} x_1 + a_{m2} x_2 + a_{m3} x_3 + ... + a_{mn} x_n
+a_{m1} x_1 + a_{m2} x_2 + a_{m3} x_3 + ... + a_{mn} x_n & = & y_m
 \end{eqnarray}
 Note that there are $m$ equations and $n$ unknowns.
 Now we rewrite it again using a more powerful technique called 
 {\it summation notation}:
 \begin{equation}
-y_i = \sum_{j=1}^n a_{ij} x_j; ~ i=[1..m]
+\sum_{j=1}^n a_{ij} x_j = y_i; ~ i=[1..m]
 \end{equation}
 Notice how much more compact this notation is yet nonetheless captures
 everything contained in the previous two systems.
 We can encapsulate this even more by {\it abstracting} the entire operation
 as a type of multiplication:
 \begin{equation}
-\vec y = A \vec x
+A \vec x = \vec y
 \label{matrix_vector_multiplication}
 \end{equation}
 where $A$ is an $m \times n$ {\it array}, $\vec y$ is a {\it vector} of length
 $m$ and $\vec x$ is a vector of length $n$.
 To bring this full circle, we write:
 \begin{equation}
-A = \left [ \begin{array}{lll}
+A = \left [ \begin{array}{ccc}
 1 & 2 & 3 \\
 3 & 7 & 2 \\
 2.1 & 5.3 & 4.7
@@ -142,24 +145,287 @@ Or alternatively:
 
 \section{Solving systems of linear equations}
 
+\label{solving}
+
 In order to solve for the system in (\ref{example_system}) we need to learn
 one more notation system.
 This one removes all the variables leaving only the constants and coefficients:
 \begin{equation}
-	\left [ \begin{array}{lll|l}
-			4 & 1 & 2 & 3 & 4 \\
-			5 & 3 & 7 & 2 & 5 \\
-			0.5 & 2.1 & 5.3 & 4.7 & 0.5
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			3 & 7 & 2 & 5 \\
+			2.1 & 5.3 & 4.7 & 0.5
 	\end{array} \right ]
 \end{equation}
 There are three elementary operations we can do on the rows of this system.
 As we would expect,
 any operation done on a row of coefficients is repeated on the constant.
-\begin{itemize}
+\begin{enumerate}
 	\item Multiply a row by a constant value
-	\item Exchange rows
 	\item Add two rows
-\end{itemize}
+	\item Exchange rows
+\end{enumerate}
+
+We start by multiplying the second row by $1/3$:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			1 & 7/3 & 2/3 & 5/3 \\
+			2.1 & 5.3 & 4.7 & 0.5
+	\end{array} \right ]
+\end{equation}
+This allows us to subtract the first row from the second:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			0 & 1/3 & -7/3 & -7/3 \\
+			2.1 & 5.3 & 4.7 & 0.5
+	\end{array} \right ]
+\end{equation}
+thus eliminating the element in the second row, first column.
+We repeat this procedure for the third row:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			0 & 1/3 & -7/3 & -7/3 \\
+			1 & 53/21 & 47/21 & 5/21
+	\end{array} \right ]
+\end{equation}
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			0 & 1/3 & -7/3 & -7/3 \\
+			0 & 3/7 & -16/21 & -79/21
+	\end{array} \right ]
+\end{equation}
+Now we multiply the second row by $9/7$:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			0 & 3/7 & -63/21 & -63/21 \\
+			0 & 3/7 & -16/21 & -79/21
+	\end{array} \right ]
+\end{equation}
+(To make it easier for the next step we haven't reduced all the fractions...)
+and subtract it from the last row:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 2 & 3 & 4 \\
+			0 & 3/7 & -3 & -3 \\
+			0 & 0 & -79/21 & -16/21
+	\end{array} \right ]
+\end{equation}
+The matrix is now in {\it upper triangular form} which makes it easy to
+solve:
+\begin{eqnarray}
+	-79/21 x_3 & = & -16/21 \\
+	x_3 & = & 21/79
+\end{eqnarray}
+\begin{eqnarray}
+	3/7 x_2 - 3 x_1 & = & -3 \\
+	3/7 x_2 - 3 (21/79) & = & -3 \\
+	x_2 & = & - 406/79
+\end{eqnarray}
+\begin{eqnarray}
+	1 x_1 + 2 x_2 + 3 x_3 & = & 4 \\
+	1 x_1 + 2 (- 406/79) + 3 (21/79) & = & 4 \\
+	x_1 & = & 1065/79
+\end{eqnarray}
+
+The process can also be continued until the matrix is {\it diagonal}:
+\begin{equation}
+	\left [ \begin{array}{ccc|c}
+			1 & 0 & 0 & 1065/79 \\
+			0 & 1 & 0 & -406/79 \\
+			0 & 0 & 1 & 1065/79
+	\end{array} \right ]
+\end{equation}
+Overall the method is known as {\it Gaussian elimination} or
+{\it row reduction}.
+
+\section{Matrix multiplication and the inverse}
+
+Here we define matrix multiplication using the summation
+notation introduced in Section \ref{notation}.
+Let $A$ be an $m \times p$ matrix while $B$ is a $p \times n$ matrix:
+\begin{equation}
+	C = A B
+\end{equation}
+\begin{equation}
+	c_{ij} = \sum_{k=1}^p a_{ik} b_{kj}| i=[1..m]; j=[1..n]
+\end{equation}
+Note that summation is over the {\it inside} indices thus the inside dimensions
+of the two matrices must agree.
+The product, $C$, must be an $m \times n$ matrix.
+
+The {\it identity matrix} is defined as a diagonal matrix in which all the
+non-zero (diagonal) elements are ones.
+Here is the $3 \times 3$ identity:
+\begin{equation}
+	\left [ \begin{array}{ccc}
+			1 & 0 & 0 \\
+			0 & 1 & 0 \\
+			0 & 0 & 1 
+	\end{array} \right ]
+\end{equation}
+The inverse of a square matrix returns the identity when multiplied with
+the original matrix:
+\begin{equation}
+	A^{-1} A = A A^{-1} = I
+\end{equation}
+
+To calculate the inverse, perform Gaussian elimination, as above, except
+using the identity matrix as the right-hand-side:
+\begin{equation}
+	\left [ \begin{array}{ccc|ccc}
+			1 & 2 & 3 & 1 & 0 & 0 \\
+			3 & 7 & 2 & 0 & 1 & 0 \\
+			2.1 & 5.3 & 4.7 & 0 & 0 & 1
+	\end{array} \right ]
+\end{equation}
+
+\section{Determinants}
+
+The determinant of a square matrix, $A$, is defined recursively as follows:
+\begin{equation}
+	\det (A) = | A | = \sum_i (-1)^{i+j} a_{ij} | A_{ij} |
+\end{equation}
+where the notation, $A_{ij}$,
+denotes the sub-matrix formed by removing the $i$th row and $j$th column
+from $A$. 
+The determinant of a $1\times 1$ matrix is the value of its single element.
+
+Based on this definition we can write the determinant of a $3 \times 3$ matrix:
+\begin{eqnarray}
+	& \left | \begin{array}{ccc}
+		a_{11} & a_{12} & a_{13} \\
+		a_{21} & a_{22} & a_{23} \\
+		a_{31} & a_{32} & a_{33}
+	\end{array} \right | \\ \nonumber
+	& = a_{11} 
+	\left | \begin{array}{cc} a_{22} & a_{23} \\
+	a_{32} & a_{33} \end{array} \right |
+	- a_{12} 
+	\left | \begin{array}{cc} a_{21} & a_{23} \\
+	a_{31} & a_{33} \end{array} \right |
+	+ a_{13}
+	\left | \begin{array}{cc} a_{21} & a_{22} \\
+	a_{31} & a_{32} \end{array} \right | \\ \nonumber
+	       & = a_{11} (a_{22} a_{33} - a_{23} a_{32})
+	- a_{12} (a_{21} a_{33} - a_{23} a_{31})
+	+ a_{13} (a_{21} a_{32} - a_{22} a_{31})
+\end{eqnarray}
+and use this formula to calculate the determinant of the example matrix:
+
+Here we prove the most important property of the determinant.
+Going back to the three matrix operations listed at the beginning of Section
+\ref{solving}: note that each of these operations can be represented 
+themselves as matrices or {\it elementary matrices}.
+Consider the first two transformations:
+\begin{equation}
+	\left [ \begin{array}{ccc}
+			1 & 0 & 0 \\
+			0 & -1/3 & 0 \\
+			0 & 0 & 1 
+	\end{array} \right ]
+\end{equation}
+(note that subtraction is equivalent to multiplication with -1 followed by
+addition) and:
+\begin{equation}
+	\left [ \begin{array}{ccc}
+			1 & 0 & 0 \\
+			1 & 1 & 0 \\
+			0 & 0 & 1 
+	\end{array} \right ]
+\end{equation}
+To swap the first and second rows, for instance, we would use:
+\begin{equation}
+	\left [ \begin{array}{ccc}
+			0 & 1 & 0 \\
+			1 & 0 & 0 \\
+			0 & 0 & 1 
+	\end{array} \right ]
+\end{equation}
+From this it is apparent that any matrix can be built up from the product
+of a set of elementary matrices.
+The determinant of the first elementary matrix is $-1/3$ while that of the 
+second one is $1$ and the third, $-1$.
+It is easy to show that the determinant of the product of any two elementary
+matrices is the same as the product of the determinants.
+Since any matrix can be built up from the product of elementary matrices,
+this property must be true in general, that is, the determinant of the
+product is the product of the determinants:
+\begin{equation}
+	|A B C ... | = |A||B||C|...
+\end{equation}
+As a corollary to this theorem, a matrix only has an inverse if the 
+determinant is non-zero. 
+A matrix with non inverse is called a {\it singular matrix} and if substituted
+into equation (\ref{matrix_vector_multiplication}), 
+will not have a unique solution.
+We will need this principle in the next section.
+
+\section{Eigenvectors and eigenvalues}
+
+The eigenvalue equation is as follows:
+\begin{equation}
+	A \vec v = \lambda \vec v
+	\label{eigenequation}
+\end{equation}
+where $\vec v$ is an {\it eigenvector} and {\it $\lambda$} is an eigenvalue.
+In other words, an eigenvector of a matrix is a vector that, when multiplied
+with the matrix, returns itself times a constant.
+We start by rearranging Equation (\ref{eigenequation}) as follows:
+\begin{equation}
+	\left ( A - \lambda I \right ) \vec v = 0
+	\label{eigenequation2}
+\end{equation}
+In order for a {\it non-trivial} solution (not all values are zero) to exist,
+the determinant of the expression in brackets must be zero:
+\begin{equation}
+	\left | A - \lambda I \right | = 0
+\end{equation}
+
+Lets calculate the eigenvalues of the example matrix:
+\begin{eqnarray}
+	& \left | \begin{array}{ccc}
+1 - \lambda & 2 & 3 \\
+3 & 7 - \lambda & 2 \\
+2.1 & 5.3 & 4.7 - \lambda
+\end{array}
+\right | \\ \nonumber
+& = (1 - \lambda) \left [(7 - \lambda)(4.7 - \lambda) - (2)(5.3) \right ] -
+(2) \left [(3)(4.7 - \lambda) - (2)(2.1) \right ] + (3) \left [(3)(5.3) - (7 - \lambda) (2.1) \right ] \\ \nonumber
+\end{eqnarray}
+Multiplying through and gathering like terms produces the following cubic
+equation:
+\begin{equation}
+	\lambda^3 - 11.7 \lambda^2 + 0.6 \lambda + 6.1 = 0
+\end{equation}
+This is known as the {\it characteristic polynomial} of the matrix
+and its roots are the eigenvalues:
+\begin{equation}
+\lambda \approx \left \lbrace \begin{array}{c} 11.6 \\ 0.775 \\ -0.678 \end{array}\right .
+\end{equation}
+
+By substituting the resulting eigenvalues back into the bracketed expression
+in (\ref{eigenequation2}), the eigenvectors may be derived.
+We demonstrate this for the largest eigenvalue:
+\begin{equation}
+	\left [ \begin{array}{ccc}
+		1 - (11.6) & 2 & 3 \\
+		3 & 7 - (11.6) & 2 \\
+		2.1 & 5.3 & 4.7 - (11.6)
+\end{array}
+\right ]
+=
+	\left [ \begin{array}{ccc}
+		 -10.6 & 2 & 3 \\
+		3 & -4.6 & 2 \\
+		2.1 & 5.3 & -7.6)
+\end{array}
+\right ]
+\end{equation}
 
 \end{document}
 

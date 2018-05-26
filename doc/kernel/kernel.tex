@@ -13,19 +13,30 @@
 
 \begin{document}
 
+\title{Kernel methods: SVM versus kernel density estimation}
+
+\author{Peter Mills}
+
+\maketitle
+
 \tableofcontents
 
 \section{Introduction}
 
 This is an introductory article on kernel density estimators and closely
 related kernel classifiers.
-The author would to focus on two things that gave him confusion when he was
+The author would like to focus on two things that gave him confusion when he was
 first learning about these topics.
 The first is to show how kernel density estimators, 
 such as k-nearest neighbours(KNN),
 are related to support vector machines (SVM).
-The second is to show how the ``kernel trick'' is used to derived the
+The second is to show how the ``kernel trick'' is used to derive the
 minimization problem in SVM.
+
+This intro was originally included as the background to \citet{Mills2012},
+however the reviewers requested that it be shortened and most of it was
+removed.
+The material still appears in the arXiv version.
 
 \section{Theory}
 
@@ -216,9 +227,6 @@ For instance, substitute the following for (\ref{constraint1}):
  \label{svmcost}
 \end{equation}
 where $\svmcost$ is the cost \citep{Mueller_etal2001}.
-Mainly we are concerned here with the decision
-function in (\ref{svm_decision}) since the initial fitting will be done with
-an external software package, namely LIBSVM \citep{Chang_Lin2011}.
 
 Three things should be noted. First, the function $\expandedspace$ appears in
 neither the final decision function, (\ref{svm_decision}), nor in the
@@ -255,32 +263,17 @@ This is a {\it linear classifier} or {\it perceptron}.
 
 \subsection{LIBSVM}
 
-LIBSVM is a machine learning software library for support vector machines 
-developed by Chih-Chung Chang and Chih-Jen Lin of 
+A good software library for support vector machines is LIBSVM. 
+It was developed by Chih-Chung Chang and Chih-Jen Lin of 
 the National Taiwan University, Taipei, Taiwan \citep{Chang_Lin2011}.
-It includes statistical classification using two regularization methods 
-for minimizing over-fitting: 
-{\it C-SVM} and {\it $\nu$-SVM}.
-It also includes code for nonlinear regression and density estimation or
-``one-class SVM''.
-SVM models were trained using the \verb/svm-train/ command while
-classifications done with \verb/svm-predict/.
 LIBSVM can be found at: \url{https://www.csie.ntu.edu.tw/~cjlin/libsvm}
 
 \subsection{LibAGF}
 
-Similar to LIBSVM, libAGF is a machine learning library but for variable kernel 
-estimation \citep{Mills2011,Terrell_Scott1992} rather than SVM.
-Like LIBSVM, it supports statistical classification, lonlinear regression
-and density estimation.
-It supports both Gaussian kernels and k-nearest neighbours.
+libAGF is another software library with programes for performing kernel
+density ``balloon'' estimation using Gaussian kernels and $k$-nearest-neighbours\citep{Mills2011}.
 It was written by Peter Mills and can be found at
 \url{https://github.com/peteysoft/libmsci}.
-
-Except for training and classifying the SVM models, all calculations in this paper were done 
-with the libAGF library. To convert a LIBSVM model to a borders model,
-the single command, \verb/svm_accelerate/, can be used.
-Classifications are then performed with \verb/classify_m/.
 
 \bibliography{../ML_learning}
 

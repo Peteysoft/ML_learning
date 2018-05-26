@@ -115,7 +115,7 @@ returns the equality constraint in (\ref{equality2}).
 For the least squares problem in (\ref{least_squares}), 
 Equation (\ref{lagrange2}) reduces to:
 \begin{equation}
-	\mat^T \mat \vec \coord + \vec \lambda \eqmat = \mat^T \vec \sol
+	\mat^T \mat \vec \coord + \eqmat^T \vec \lambda = \mat^T \vec \sol
 \end{equation}
 \citep{Lawson_Hanson1995}
 
@@ -124,11 +124,11 @@ Equation (\ref{lagrange2}) reduces to:
 	\caption{Illustration of Lagrange multiplier technique for equality constraints.}
 \end{figure}
 
-\section{Inequality constraints}
+\section{KKT conditions}
 
 \begin{figure}
 	\includegraphics[width=0.9\textwidth]{inequality.eps}
-	\caption{Illustration of an inequality constraint.}\label{ineq_fig}
+	\caption{Inequality constraint in KKT conditions.}\label{ineq_fig}
 \end{figure}
 
 With a slight variation, Lagrange multipliers can work with inequality
@@ -163,6 +163,16 @@ Put more succinctly:
 	\slack_i \ineqfn_i = 0
 \end{equation}
 
+When combined with Lagrange multipliers, these are the Karesh-Kuhn-Tucker (KKT)
+conditions:
+\begin{equation}
+	\nabla_{\vec \coord} \cost + \sum_i \lambda_i \nabla_{\vec \coord} \eqfn_i - \sum_i \slack_i \nabla_{\vec \coord} \ineqfn_i = 0
+\end{equation}
+Reduced to a least-squares problem:
+\begin{equation}
+	\mat^T \mat \vec \coord + \eqmat^T \vec \lambda = \mat^T \vec \sol + \ineqmat^T \vec \slack
+\end{equation}
+	
 
 \bibliography{../ML_learning}
 
