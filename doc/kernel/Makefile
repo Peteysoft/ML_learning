@@ -1,6 +1,6 @@
-TARGET=structures
+TARGET=kernel
 
-AUX=extensible_array.ps heap.ps linked_list.ps tree.ps tree2.ps
+AUX=kernel_symbol.tex
 
 $(TARGET).pdf: $(TARGET).tex $(AUX)
 	latex $(TARGET)

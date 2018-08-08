@@ -1,5 +1,7 @@
 all:
-	make -C structures
 	make -C Bayesian
-	make -C svd
+	make -C Boolean
 	make -C kernel
+	make -C quadratic
+	make -C structures
+	make -C svd
