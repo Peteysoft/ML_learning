@@ -8,14 +8,16 @@
 %symbols for general kernel methods:
 \newcommand{\vectorkernel}{K}		%kernel function of two vectors
 \newcommand{\scalarkernel}{K}		%kernel function of a single scalar
-\newcommand{\kernelparam}{\vec \kappa}	%kernel parameters
+%\newcommand{\kernelparam}{\vec \kappa}	%kernel parameters
+\newcommand{\kernelparam}{\vec r}	%kernel parameters
 \newcommand{\norm}{N}			%integral of kernel function
 \newcommand{\nsample}{n}		%number of training samples
 \newcommand{\dimension}{D}		%dimension of feature space
 %kernel density estimator
-\newcommand{\densityestimator}{\tilde p}
+\newcommand{\densityestimator}{f}
 %"bandwidth":
-\newcommand{\bandwidth}{\sigma}
+%\newcommand{\bandwidth}{\sigma}
+\newcommand{\bandwidth}{h}
 %single coordinate:
 \newcommand{\coord}{x}
 %coordinate of a training sample:
@@ -35,9 +37,9 @@
 %actual probability:
 \newcommand{\probability}{P}
 %actual conditional probability:
-\newcommand{\condprob}{p}
+\newcommand{\condprob}{P}
 %actual joint probability:
-\newcommand{\jointprob}{p}
+\newcommand{\jointprob}{P}
 %sum of all the kernels:
 \newcommand{\kernelsum}{W}
 
@@ -45,7 +47,8 @@
 %Lagrange multipliers in dual optimization scheme:
 \newcommand{\svmcoeff}{w}
 %theoretical expanded kernel space:
-\newcommand{\expandedspace}{\vec\phi}
+%\newcommand{\expandedspace}{\vec\phi}
+\newcommand{\expandedspace}{\vec q}
 %decision function:
 \newcommand{\svmdecision}{\decision_{svm}}
 %parameters for theoretical linear discrimination border:

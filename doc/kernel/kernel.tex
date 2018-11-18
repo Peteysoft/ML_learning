@@ -8,14 +8,14 @@
 
 \usepackage{url}
 
-\newenvironment{eqnnon}{\begin{equation}}{\end{equation}}
-\newenvironment{eqnarraynon}{\begin{eqnarray}}{\end{eqnarray}}
+\newenvironment{eqnnon}{\begin{equation*}}{\end{equation*}}
+\newenvironment{eqnarraynon}{\begin{eqnarray*}}{\end{eqnarray*}}
 
 \input{kernel_symbol.tex}
 
 \begin{document}
 
-\title{Kernel methods: SVM versus kernel density estimation}
+\title{Understanding kernel methods: SVM versus kernel density}
 
 \author{Peter Mills}
 
@@ -29,9 +29,9 @@ This is an introductory article on kernel density estimators and closely
 related kernel classifiers.
 The author would like to focus on two things that gave him confusion when he was
 first learning about these topics.
-The first is to show how kernel density estimators, 
-such as k-nearest neighbours(KNN),
-are related to support vector machines (SVM).
+The first is to show how a kernel density estimator, 
+such as a Parzen's window or k-nearest neighbours(KNN),
+is related to a support vector machine (SVM).
 The second is to show how the ``kernel trick'' is used to derive the
 minimization problem in SVM.
 
@@ -46,15 +46,15 @@ The material still appears in the arXiv version.
 
 \subsection{Kernel estimation}
 
-A kernel is a scalar function of two vectors that can be used for 
-non-parametric density estimation. A typical ``kernel-density estimator"
-looks like this:
+A {\it kernel} is a scalar function of two vectors that can be used for 
+non-parametric density estimation. A typical {\it kernel density estimator}
+is a linear filter that convolves a filter function or kernel,
+$\vectorkernel$ with the training data:
 \begin{eqnnon}
 	\densityestimator(\testpoint) = \frac {1}{\nsample \norm} \sum_{i=1}^\nsample \vectorkernel(\testpoint, \sample_i, \kernelparam)
 	\label{kernel_estimator}
 \end{eqnnon}
-where $\densityestimator$ is an estimator for the density, $\probability$, 
-$\vectorkernel$ is the kernel function,
+where $\densityestimator$ is an estimator for the density, $\probability$,
 $\lbrace \sample_i | ~ i \in [1,\nsample] \rbrace$ are a set of training samples, 
 $\testpoint$ is the test point,
 and $\kernelparam$ is a set of parameters. 
@@ -91,8 +91,10 @@ Let the kernel function take the following form:
 	\vectorkernel(\point, \point^\prime, \bandwidth) = \scalarkernel \left (\frac{|\point - \point^\prime|}{\bandwidth} \right )
 	\label{scalar_kernel_def}
 \end{eqnnon}
-where $\bandwidth$ is the ``bandwidth''. 
-In \citet{Mills2011}, $\bandwidth$ is made proportional to the density:
+where $\bandwidth$ is the width of the smoothing kernel
+which is the inverse of the bandwidth in frequency space.
+In \citet{Mills2011}, for example, 
+$\bandwidth$ is made proportional to the density:
 \begin{eqnnon}
 	\bandwidth \propto \frac{1}{\probability^{1/\dimension}} \approx \frac{1}{\densityestimator^{1/\dimension}}
 	\label{setting_the_bandwidth}
@@ -100,10 +102,10 @@ In \citet{Mills2011}, $\bandwidth$ is made proportional to the density:
 where $\dimension$ is the dimension of the feature space.
 Since the normalization coefficient, $\norm$, must include the factor,
 ${\bandwidth^\dimension}$, some rearrangement shows that:
-\begin{equation}
+\begin{eqnnon}
 	\frac{1}{\nsample} \sum_i \scalarkernel \left (\frac{|\testpoint - \sample_i|}{\bandwidth} \right ) = \kernelsum = const.
 	\label{agf_def}
-\end{equation}
+\end{eqnnon}
 This is a generalization of the $k$-nearest-neighbours (KNN) scheme in which the
 free parameter, $\kernelsum$, takes the place of $k$ \citep{Mills2009,Mills2011}.
 The bandwidth is determined uniquely for a given test point but is held constant for that
@@ -113,10 +115,10 @@ in which bandwidths are different for each training point but need only be deter
 \citep{Terrell_Scott1992}.
 
 A common kernel is the multi-dimensional Gaussian:
-\begin{equation}
+\begin{eqnnon}
 	\vectorkernel(\point, \point^\prime, \bandwidth) = \exp \left ( - \frac{|\point - \point^\prime|^2}{2 \bandwidth^2} \right )
 	\label{Gaussian_kernel}
-\end{equation}
+\end{eqnnon}
 %$\scalarkernel(x)=\exp(-x^2/2)$
 also called the normal equation and in SVM it is referred to as a
 ``radial basis function'' or RBF for short.
@@ -126,13 +128,13 @@ to classify satellite data.
 
 To return the KNN method, consider a ``square'' kernel that returns 1 below
 a certain radius and 0 otherwise:
-\begin{equation}
-	\scalarkernel(r) = \left \lbrace
+\begin{eqnnon}
+	\scalarkernel(z) = \left \lbrace
 	\begin{array}{lr}
-		1; & r \ge \bandwidth \\
-		0; & r > \bandwidth
+		1; & z \ge \bandwidth \\
+		0; & z > \bandwidth
 	\end{array} \right .
-\end{equation}
+\end{eqnnon}
 
 Another method of improving the performance of a kernel-density estimator
 is to multiply each kernel by a coefficient:
@@ -148,8 +150,8 @@ the classification error. We will briefly outline this procedure.
 
 \subsection{Support Vector Machines}
 
-The basic ``trick'' of kernel-based SVM methods is to replace a dot product
-with the kernel function in the assumption that it can be rewritten
+The basic ``trick'' of kernel-based SVM methods is to expand
+the kernel function in the assumption that it can be rewritten
 as a dot product of a transformed and expanded feature space:
 \begin{eqnnon}
 	\vectorkernel(\point, \point^\prime) = \expandedspace(\point) \cdot \expandedspace(\point^\prime)
@@ -159,18 +161,18 @@ For simplicity we have ommitted the kernel parameters.
 $\expandedspace$ is a vector function of the feature space.
 The simplest example of a kernel function that has a closed, analytical and
 finite-dimensional $\expandedspace$ is the square of the dot product:
-\begin{eqnarray}
+\begin{eqnarraynon}
 	\vectorkernel(\point, \point^\prime) & = & (\point \cdot \point^\prime)^2 \\ \nonumber
 					 & = & (\coord_1^2, \coord_2^2, \coord_3^2, ..., \sqrt{2} \coord_1 \coord_2, \sqrt{2} \coord_1 \coord_3, ... \sqrt{2} \coord_2 \coord_3, ...) \cdot \\ \nonumber
       & &	 ({\coord^\prime_1}^2, {\coord^\prime}_2^2, {\coord^\prime}_3^2, ..., \sqrt{2} \coord^\prime_1 \coord^\prime_2, \sqrt{2} \coord^\prime_1 \coord^\prime_3, ... \sqrt{2} \coord^\prime_2 \coord^\prime_3, ...) 
-\end{eqnarray}
+\end{eqnarraynon}
 but it should be noted that in more complex cases, 
 there is no need to actually construct $\expandedspace$ since it is replaced by the 
 kernel function, $\vectorkernel$, in the final analysis.
 
 In a binary SVM classifier, the classes are separated by a single hyper-plane
-defined by $\svmbordernormal$ and $\svmborderconst$.
-In a kernel-based SVM, this hyperplane bisects not the regular feature
+which we can specify through a normal vector, $\svmbordernormal$, and a constant, $\svmborderconst$.
+In a kernel-based SVM, this hyper-plane bisects not the regular feature
 space, but the theoretical, transformed space defined by the function,
 $\expandedspace(\point)$.
 The decision value is calculated via a dot product:
@@ -178,29 +180,29 @@ The decision value is calculated via a dot product:
 	\svmdecision(\testpoint)=\svmbordernormal \cdot \expandedspace(\testpoint) + \svmborderconst
 	\label{decision_function0}
 \end{equation}
-and the class determined, as before, by the sign of the decision value:
-\begin{equation}
+and the class determined by the sign of the decision value:
+\begin{eqnnon}
 	\class(\testpoint) = \frac{\svmdecision(\testpoint)}{|\svmdecision(\testpoint)|}
 	\label{class_value}
-\end{equation}
+\end{eqnnon}
 where for convenience, the class labels are given by $c \in \lbrace -1, 1 \rbrace$.
 
 In the first step of the minimization procedure, 
 the magnitude of the border normal, $\svmbordernormal$, 
 is minimized subject to the constraint that there are no classification 
 errors:
-\begin{eqnarray*}
+\begin{eqnarraynon}
 	\min_{\svmbordernormal, \svmborderconst} \frac{1}{2} | \svmbordernormal | \\ \nonumber
 	\svmdecision(\sample_i) \classlabel_i \ge 1
-\end{eqnarray*}
+\end{eqnarraynon}
 Introducing the coefficients, $\lbrace \svmcoeff_i \rbrace$, 
 as Lagrange multipliers on the constraints:
-\begin{equation}
+\begin{eqnnon}
 	\min_{\svmbordernormal, b} \left \lbrace \frac{1}{2} | \svmbordernormal | - \sum_i \svmcoeff_i \left [ \svmdecision(\sample_i) \classlabel_i -1 \right ] \right \rbrace
-\end{equation}
+\end{eqnnon}
 generates the following pair of analytic expressions:
 \begin{eqnarray}
-	\sum_i \svmcoeff_i \classlabel_i & = & 0 \\
+	\sum_i \svmcoeff_i \classlabel_i & = & 0 \nonumber \\
 	\svmbordernormal & = & \sum_i \svmcoeff_i \classlabel \expandedspace(\sample_i) \label{border_vector_equation}
 \end{eqnarray}
 through setting the derivatives w.r.t. the minimizers to zero.
@@ -212,7 +214,7 @@ into the decision function in (\ref{decision_function0}) produces the following:
 \end{equation}
 Thus, the final, dual, quadratic optimization problem looks like this:
 \begin{equation}
-	\max_{\lbrace \svmcoeff_i \rbrace} \left [ \sum_i \svmcoeff_i 
+	\min_{\lbrace \svmcoeff_i \rbrace} \left [ \sum_i \svmcoeff_i 
 	- \frac{1}{2} \sum_{i, j} \svmcoeff_i \svmcoeff_j \classlabel_i \classlabel_j \vectorkernel(\sample_i, \sample_j) \right ] \label{dual_problem}
 \end{equation}
 \begin{eqnarray}
@@ -222,12 +224,12 @@ Thus, the final, dual, quadratic optimization problem looks like this:
 There are a number of refinements that can be applied to the optimization
 problem in (\ref{dual_problem})-(\ref{constraint2}), chiefly to reduce over-fitting and to add
 some ``margin'' to the decision border to allow for the possibility of
-classification errors.
-For instance, substitute the following for (\ref{constraint1}):
-\begin{equation}
+classification errors thus preventing over-fitting.
+For instance, replace (\ref{constraint1}) with the following:
+\begin{eqnnon}
  0 \le \svmcoeff_i \le \svmcost
  \label{svmcost}
-\end{equation}
+\end{eqnnon}
 where $\svmcost$ is the cost \citep{Mueller_etal2001}.
 
 Three things should be noted. First, the function $\expandedspace$ appears in
@@ -244,19 +246,19 @@ be slow, just as in other kernel estimation problems.
 
 Third, since SVM is a linear classifier operating in a transformed and expanded
 feature space, using a simple dot product for the kernel funcion returns a linear classifier:
-\begin{eqnarray}
+\begin{eqnarraynon}
 	\vectorkernel(\point, \point^\prime) & = & \point \cdot \point^\prime \\
-	\svmdecision(\testpoint) & = & \sum_i \svmcoeff_i \classlabel_i \testpoint \cdot \sample_i + \svmborderconst
-\end{eqnarray}
-By pulling out the test point from the summation we can show that the border
-to the class normal is equal to:
-\begin{equation}
+	\decision(\testpoint) & = & \sum_i \svmcoeff_i \classlabel_i \testpoint \cdot \sample_i + \svmborderconst
+\end{eqnarraynon}
+By pulling out the test point from the summation we can show that the normal
+to the class border is equal to:
+\begin{eqnnon}
 	\svmbordernormal = \sum_i \svmcoeff_i \classlabel_i \sample_i
-\end{equation}
+\end{eqnnon}
 while the decision function is calculated:
-\begin{equation}
-	\svmdecision(\testpoint)=\svmbordernormal \cdot \testpoint + \svmborderconst
-\end{equation}
+\begin{eqnnon}
+	\decision(\testpoint)=\svmbordernormal \cdot \testpoint + \svmborderconst
+\end{eqnnon}
 This is a {\it linear classifier} or {\it perceptron}.
 	
 \section{Software}
